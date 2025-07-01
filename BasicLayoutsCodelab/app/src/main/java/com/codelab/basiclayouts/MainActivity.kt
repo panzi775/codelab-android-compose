@@ -23,17 +23,21 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -64,17 +68,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import com.codelab.basiclayouts.ui.theme.MySootheTheme
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 让内容可以绘制到状态栏/导航栏下，实现沉浸式
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             MySootheApp(windowSizeClass)
@@ -100,6 +109,19 @@ fun SearchBar(
     }, modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
+    )
+}
+
+
+@Composable
+fun StatusBarBackground(color: Color) {
+    val insets = WindowInsets.statusBars
+    val density = LocalDensity.current
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(with(density) { insets.getTop(density).toDp() })
+            .background(color)
     )
 }
 
@@ -201,12 +223,17 @@ fun AlignYourBodyRow(
 fun FavoriteCollectionsGrid(
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalGrid (
+
+    // 根据favoriteCollectionsData计算LazyVerticalGrid高度
+    // 这里假设每个卡片高度为80dp，间距为16dp，总共有6行
+    val totalHeight = (favoriteCollectionsData.size + 1).div(2)
+        .times(80) + (favoriteCollectionsData.size / 2).times(16) + 16
+    LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.height(1600.dp)
+        modifier = modifier.height(totalHeight.dp)
     ) {
         items(favoriteCollectionsData) { item ->
             FavoriteCollectionCard(item.drawable, item.text, Modifier.height(80.dp))
@@ -235,12 +262,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     Column(
         modifier.verticalScroll(rememberScrollState())
     ) {
+        StatusBarBackground(color = Color.Transparent)
         Spacer(Modifier.height(16.dp))
         SearchBar(Modifier.padding(horizontal = 16.dp))
         HomeSection(title = R.string.align_your_body) {
             AlignYourBodyRow()
         }
-        HomeSection(title = R.string.favorite_collections) {
+        HomeSection(
+            title = R.string.favorite_collections,
+            modifier = Modifier.background(Color.Red)
+        ) {
             FavoriteCollectionsGrid()
         }
         Spacer(Modifier.height(16.dp))
@@ -305,7 +336,7 @@ fun MySootheApp(windowSize: WindowSizeClass) {
         }
 
         WindowWidthSizeClass.Expanded -> {
-            Log.i("test", "MySootheApp: ")
+            Log.i("test", "MySootheApp 111 ")
             MySootheAppLandscape()
         }
     }
