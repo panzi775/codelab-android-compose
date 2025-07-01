@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // 让内容可以绘制到状态栏/导航栏下，实现沉浸式
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             MySootheApp(windowSizeClass)
@@ -262,7 +263,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     Column(
         modifier.verticalScroll(rememberScrollState())
     ) {
-        StatusBarBackground(color = Color.Transparent)
         Spacer(Modifier.height(16.dp))
         SearchBar(Modifier.padding(horizontal = 16.dp))
         HomeSection(title = R.string.align_your_body) {
