@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -263,8 +264,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     Column(
         modifier.verticalScroll(rememberScrollState())
     ) {
-        Spacer(Modifier.height(16.dp))
-        SearchBar(Modifier.padding(horizontal = 16.dp))
+        SearchBar(
+            Modifier
+                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+        )
         HomeSection(title = R.string.align_your_body) {
             AlignYourBodyRow()
         }
@@ -309,6 +312,7 @@ private fun SootheBottomNavigation(modifier: Modifier = Modifier) {
 fun MySootheAppPortrait() {
     MySootheTheme {
         Scaffold(
+            contentWindowInsets = WindowInsets(0),
             bottomBar = { SootheBottomNavigation() }) { padding ->
             HomeScreen(Modifier.padding(padding))
         }
